@@ -9,8 +9,8 @@ function Card(props) {
 
   return (
     <div className="element">
-      <img className="element__photo" 
-        alt={props.card.name} 
+      <img className="element__photo"
+        alt={props.card.name}
         src={props.card.link}
         onClick={handleCardClick} />
       <h2 className="element__title">{props.card.name}</h2>
