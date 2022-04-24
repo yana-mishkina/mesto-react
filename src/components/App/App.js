@@ -8,26 +8,38 @@ import { api } from "../../utils/api";
 
 function App() {
 
-  const [isEditProfilePopupOpen, setEditProfilePopupOpen] = React.useState(false);
-  const [isAddPlacePopupOpen, setisAddPlacePopupOpen] = React.useState(false);
-  const [isEditAvatarPopupOpen, setisEditAvatarPopupOpen] = React.useState(false);
+  const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
+  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
+  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
+  const [isPhotoViewingPopupOpen, setIsPhotoViewingPopupOpen] = React.useState(false);
+  const [selectedCard, setSelectedCard] = React.useState({
+    name: "",
+    link: "",
+  });
 
   function handleEditProfilePopupOpen() {
-    setEditProfilePopupOpen(true);
+    setIsEditProfilePopupOpen(true);
   }
 
   function handleAddPhotoPopupOpen() {
-    setisAddPlacePopupOpen(true);
+    setIsAddPlacePopupOpen(true);
   }
 
   function handleEditAvatarPopupOpen() {
-    setisEditAvatarPopupOpen(true);
+    setIsEditAvatarPopupOpen(true);
+  }
+
+  function handleCardClick(card) {
+    setSelectedCard(card);
+    setIsPhotoViewingPopupOpen(true);
   }
 
   function closeAllPopups() {
-    setEditProfilePopupOpen(false);
-    setisAddPlacePopupOpen(false);
-    setisEditAvatarPopupOpen(false);
+    setIsEditProfilePopupOpen(false);
+    setIsAddPlacePopupOpen(false);
+    setIsEditAvatarPopupOpen(false);
+    setIsPhotoViewingPopupOpen(false);
+    setSelectedCard({ name: "", link: "" });
   }
 
   return (
@@ -62,7 +74,12 @@ function App() {
             <span className="popup__field-error link-input-error"></span>
         </PopupWithForm>
 
-        <PopupWithImage />
+        <PopupWithImage
+          name="viewing"
+          card={selectedCard}
+          isOpen={isPhotoViewingPopupOpen}
+          onClose={closeAllPopups}
+        />
 
         <PopupWithForm 
           name="delete-confirm"
@@ -88,6 +105,7 @@ function App() {
         onEditProfile={handleEditProfilePopupOpen}
         onAddPlace={handleAddPhotoPopupOpen}
         onEditAvatar={handleEditAvatarPopupOpen}
+        onCardClick={handleCardClick}
         />
         
         <Footer />

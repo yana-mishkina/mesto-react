@@ -1,26 +1,25 @@
 import React from "react";
 import { api } from "../../utils/api";
-// import Card from "../Card/Card";
-import deleteCardLogo from '../../images/Trash_button.svg'
+import Card from "../Card/Card";
 
 function Main(props) {
 
   const [userName, setUserName] = React.useState('');
   const [userDescription, setUserDescription] = React.useState('');
   const [userAvatar, setUserAvatar] = React.useState('');
-  const [cards, setCards] = React.useState();
+  const [cards, setCards] = React.useState([]);
 
   React.useEffect(() => {
     api.getData()
-      .then(( [userData, cardsList] ) => {
+      .then(([userData, cardsList]) => {
         setUserName(userData.name);
         setUserDescription(userData.about);
         setUserAvatar(userData.avatar);
         setCards(cardsList);
       })
       .catch((err) => console.log(err));
-  }
-
+  },
+    []
   )
 
   return (
@@ -38,23 +37,15 @@ function Main(props) {
         <button className="button button_type_add profile__button" type="button" onClick={props.onAddPlace}></button>
       </section>
 
-      <section class="elements">
-      {cards.map(card => {
-      return (
-        <div className="element">
-          <img className="element__photo" alt={card.name} src={card.link} />
-          <h2 className="element__title">{card.name}</h2>
-          <div className="element__likes">
-            <button className="button button_type_like element__button element__button_disabled" type="button"></button>
-            <span className="element__like-count"></span>
-          </div>
-          <button className="button button_type_delete element__button" type="reset">
-            <img className="button__icon button__icon_type_delete" alt="Иконка удаления фото"
-              src={deleteCardLogo} />
-          </button>
-        </div>
-      )
-    })}
+      <section className="elements">
+        {cards.map((card) => (
+          <Card 
+          key={card._id}
+          card={card}
+          onCardClick={props.onCardClick}
+          />
+        )
+        )}
       </section>
 
     </main>

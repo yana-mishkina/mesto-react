@@ -1,10 +1,18 @@
+import React from 'react';
 import deleteCardLogo from '../../images/Trash_button.svg'
 
 function Card(props) {
 
+  function handleCardClick() {
+    props.onCardClick(props.card);
+  }
+
   return (
     <div className="element">
-      <img className="element__photo" alt={props.card.name} src={props.card.link} />
+      <img className="element__photo" 
+        alt={props.card.name} 
+        src={props.card.link}
+        onClick={handleCardClick} />
       <h2 className="element__title">{props.card.name}</h2>
       <div className="element__likes">
         <button className="button button_type_like element__button element__button_disabled" type="button"></button>
