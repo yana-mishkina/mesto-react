@@ -4,6 +4,9 @@ import Footer from "../Footer/Footer";
 import Main from "../Main/Main";
 import PopupWithForm from "../PopupWithForm/PopupWithForm";
 import ImagePopup from "../ImagePopup/ImagePopup";
+import { api } from "../../utils/api";
+import { CurrentUserContext } from "../../contexts/CurrentUserContext";
+import EditProfilePopup from "../EditProfilePopup/EditProfilePopup";
 
 function App() {
 
@@ -15,6 +18,20 @@ function App() {
     name: "",
     link: "",
   });
+  const [currentUser, setCurrentUser] = React.useState({});
+  const [cards, setCards] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    api.getData()
+      .then(([userData, cardsList]) => {
+        setCurrentUser(userData);
+        setCards(cardsList);
+      })
+      .catch((err) => console.log(err));
+  },
+    []
+  )
 
   function handleEditProfilePopupOpen() {
     setIsEditProfilePopupOpen(true);
@@ -41,55 +58,70 @@ function App() {
     setSelectedCard({ name: "", link: "" });
   }
 
+  function handleUpdateUser(data) {
+    setIsLoading(true);
+    api.editProfile(data.name, data.about)
+      .then((name, about) => {
+        setCurrentUser(name, about);
+        closeAllPopups();
+      })
+      .catch((err) => console.log(err)) 
+      .finally(() => {
+        setIsLoading(false);
+      })
+  }
+
   return (
-    <div className="App">
-      <div className="page">
+    <CurrentUserContext.Provider value={currentUser}>
+      <div className="App">
+        <div className="page">
 
-        <PopupWithForm
-          name="edit-profile"
-          title="Редактировать профиль"
-          button="Сохранить"
-          isOpen={isEditProfilePopupOpen}
-          onClose={closeAllPopups}>
-          <input type="text" className="popup__field popup__field_value_name" id="name-input" name="name"
-            maxLength="40" minLength="2" required />
-          <span className="popup__field-error name-input-error"></span>
-          <input type="text" className="popup__field popup__field_value_job" id="job-input" name="job"
-            maxLength="200" minLength="2" required />
-          <span className="popup__field-error job-input-error"></span>
-        </PopupWithForm>
+          <EditProfilePopup 
+            isOpen={isEditProfilePopupOpen} 
+            onClose={closeAllPopups} 
+            onUpdateUser={handleUpdateUser}
+            isLoadingData={isLoading}
+            />
 
-        <PopupWithForm
-          name="add-photo"
-          title="Новое место"
-          button="Создать"
-          isOpen={isAddPlacePopupOpen}
-          onClose={closeAllPopups}>
-          <input type="text" placeholder="Название" className="popup__field popup__field_value_place-title" id="place-input"
-            name="name" maxLength="30" minLength="2" required />
-          <span className="popup__field-error place-input-error"></span>
-          <input type="url" placeholder="Ссылка на картинку" className="popup__field popup__field_value_link" id="link-input"
-            name="link" required />
-          <span className="popup__field-error link-input-error"></span>
-        </PopupWithForm>
+          <PopupWithForm
+            name="add-photo"
+            title="Новое место"
+            buttonText="Создать"
+            loadingButtonText="Сохранение..."
+            isLoadingData={isLoading}
+            isOpen={isAddPlacePopupOpen}
+            onClose={closeAllPopups}>
+            <input type="text" placeholder="Название" className="popup__field popup__field_value_place-title" id="place-input"
+              name="name" maxLength="30" minLength="2" required />
+            <span className="popup__field-error place-input-error"></span>
+            <input type="url" placeholder="Ссылка на картинку" className="popup__field popup__field_value_link" id="link-input"
+              name="link" required />
+            <span className="popup__field-error link-input-error"></span>
+          </PopupWithForm>
 
-        <ImagePopup
-          name="viewing"
-          card={selectedCard}
-          isOpen={isPhotoViewingPopupOpen}
-          onClose={closeAllPopups}
-        />
+          <ImagePopup
+            name="viewing"
+            card={selectedCard}
+            isOpen={isPhotoViewingPopupOpen}
+            onClose={closeAllPopups}
+          />
 
-        <PopupWithForm
-          name="delete-confirm"
-          title="Вы уверены?"
-          button="Да"
-        />
+          <PopupWithForm />
+
+          <PopupWithForm
+            name="delete-confirm"
+            title="Вы уверены?"
+            buttonText="Да"
+            loadingButtonText="Удаление..."
+            isLoadingData={isLoading}
+          />
 
         <PopupWithForm
           name="edit-avatar"
           title="Обновить аватар"
-          button="Сохранить"
+          buttonText="Сохранить"
+          loadingButtonText="Сохранение..."
+          isLoadingData={isLoading}
           isOpen={isEditAvatarPopupOpen}
           onClose={closeAllPopups}>
           <input type="url" placeholder="Ссылка на фото"
@@ -98,19 +130,21 @@ function App() {
           <span className="popup__field-error link-input-avatar-error"></span>
         </PopupWithForm>
 
-        <Header />
+          <Header />
 
-        <Main
-          onEditProfile={handleEditProfilePopupOpen}
-          onAddPlace={handleAddPhotoPopupOpen}
-          onEditAvatar={handleEditAvatarPopupOpen}
-          onCardClick={handleCardClick}
-        />
+          <Main
+            onEditProfile={handleEditProfilePopupOpen}
+            onAddPlace={handleAddPhotoPopupOpen}
+            onEditAvatar={handleEditAvatarPopupOpen}
+            onCardClick={handleCardClick}
+            cards={cards}
+          />
 
-        <Footer />
+          <Footer />
 
+        </div>
       </div>
-    </div>
+    </CurrentUserContext.Provider>
   );
 }
 

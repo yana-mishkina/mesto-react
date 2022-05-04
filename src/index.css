@@ -49,3 +49,4 @@
 @import url(./blocks/popup/__title/_type/popup__title_type_edit-avatar.css);
 @import url(./blocks/button/_type/button_type_edit-avatar.css);
 @import url(./blocks/profile/__edit-icon/profile__edit-icon.css);
+@import url(./blocks/button/_hidden/button_hidden.css);

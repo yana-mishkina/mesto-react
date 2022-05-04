@@ -1,10 +1,19 @@
 import React from 'react';
 import deleteCardLogo from '../../images/Trash_button.svg'
+import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 
 function Card(props) {
 
+  const currentUser = React.useContext(CurrentUserContext);
+  const isOwn = props.card.owner._id === currentUser._id;
+  const isLiked = props.card.likes.some(i => i._id === currentUser._id);
+
   function handleCardClick() {
     props.onCardClick(props.card);
+  }
+
+  function handleLikeClick() {
+    props.onCardLike(props.card)
   }
 
   return (
@@ -15,10 +24,13 @@ function Card(props) {
         onClick={handleCardClick} />
       <h2 className="element__title">{props.card.name}</h2>
       <div className="element__likes">
-        <button className="button button_type_like element__button element__button_disabled" type="button"></button>
+        <button className={`"button button_type_like element__button" ${isLiked ? "element__button_disabled" : ""}`} 
+        type="button"
+        onClick={handleLikeClick}></button>
         <span className="element__like-count"></span>
       </div>
-      <button className="button button_type_delete element__button" type="reset">
+      <button className={`"button button_type_delete element__button" ${isOwn ? "" : "button_hidden"}`}
+      type="reset">
         <img className="button__icon button__icon_type_delete" alt="Иконка удаления фото"
           src={deleteCardLogo} />
       </button>
