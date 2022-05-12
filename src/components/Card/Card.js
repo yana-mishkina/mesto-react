@@ -16,6 +16,10 @@ function Card(props) {
     props.onCardLike(props.card)
   }
 
+  function handleDeleteClick() {
+    props.onCardDelete(props.card)
+  }
+
   return (
     <div className="element">
       <img className="element__photo"
@@ -24,13 +28,16 @@ function Card(props) {
         onClick={handleCardClick} />
       <h2 className="element__title">{props.card.name}</h2>
       <div className="element__likes">
-        <button className={`"button button_type_like element__button" ${isLiked ? "element__button_disabled" : ""}`} 
-        type="button"
-        onClick={handleLikeClick}></button>
+        <button 
+          className={`"button button_type_like element__button" ${isLiked ? "" : "element__button_disabled"}`} 
+          type="button"
+          onClick={handleLikeClick}></button>
         <span className="element__like-count"></span>
       </div>
-      <button className={`"button button_type_delete element__button" ${isOwn ? "" : "button_hidden"}`}
-      type="reset">
+      <button 
+        className={`"button button_type_delete element__button" ${isOwn ? "" : "button_hidden"}`}
+        type="reset"
+        onClick={handleDeleteClick}>
         <img className="button__icon button__icon_type_delete" alt="Иконка удаления фото"
           src={deleteCardLogo} />
       </button>

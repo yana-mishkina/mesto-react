@@ -7,6 +7,8 @@ import ImagePopup from "../ImagePopup/ImagePopup";
 import { api } from "../../utils/api";
 import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 import EditProfilePopup from "../EditProfilePopup/EditProfilePopup";
+import EditAvatarPopup from "../EditAvatarPopup/EditAvatarPopup";
+import AddPlacePopup from "../AddPlacePopup/AddPlacePopup";
 
 function App() {
 
@@ -32,6 +34,25 @@ function App() {
   },
     []
   )
+
+  function handleCardLike(card) {
+    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    api.changeLikeCardStatus(card._id, isLiked)
+      .then((newCard) => {
+        const newCards = cards.map(c => c._id === card._id ? newCard : c);
+        setCards(newCards);
+      })
+      .catch((err) => console.log(err));
+    }
+
+  function handleCardDelete(deletedCard) {
+    api.deleteCard(deletedCard._id)
+      .then(() => {
+        const newCards = cards.filter(currentCard => currentCard != deletedCard);
+        setCards(newCards);
+      })
+      .catch((err) => console.log(err));
+  }
 
   function handleEditProfilePopupOpen() {
     setIsEditProfilePopupOpen(true);
@@ -71,6 +92,32 @@ function App() {
       })
   }
 
+  function handleUpdateAvatar(data) {
+    setIsLoading(true);
+    api.editAvatar(data.avatar)
+      .then((avatar) => {
+        setCurrentUser(avatar);
+        closeAllPopups();
+      })
+      .catch((err) => console.log(err)) 
+      .finally(() => {
+        setIsLoading(false);
+      })
+  }
+
+  function handleAddPlaceSubmit(data) {
+    setIsLoading(true);
+    api.addCard(data.name, data.link)
+      .then((newCard) => {
+        setCards([newCard, ...cards]);
+        closeAllPopups();
+      })
+      .catch((err) => console.log(err)) 
+      .finally(() => {
+        setIsLoading(false);
+      })
+  }
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
@@ -83,21 +130,12 @@ function App() {
             isLoadingData={isLoading}
             />
 
-          <PopupWithForm
-            name="add-photo"
-            title="Новое место"
-            buttonText="Создать"
-            loadingButtonText="Сохранение..."
+          <AddPlacePopup
             isLoadingData={isLoading}
             isOpen={isAddPlacePopupOpen}
-            onClose={closeAllPopups}>
-            <input type="text" placeholder="Название" className="popup__field popup__field_value_place-title" id="place-input"
-              name="name" maxLength="30" minLength="2" required />
-            <span className="popup__field-error place-input-error"></span>
-            <input type="url" placeholder="Ссылка на картинку" className="popup__field popup__field_value_link" id="link-input"
-              name="link" required />
-            <span className="popup__field-error link-input-error"></span>
-          </PopupWithForm>
+            onClose={closeAllPopups}
+            onAddPlace={handleAddPlaceSubmit}>
+          </AddPlacePopup>
 
           <ImagePopup
             name="viewing"
@@ -116,19 +154,12 @@ function App() {
             isLoadingData={isLoading}
           />
 
-        <PopupWithForm
-          name="edit-avatar"
-          title="Обновить аватар"
-          buttonText="Сохранить"
-          loadingButtonText="Сохранение..."
-          isLoadingData={isLoading}
-          isOpen={isEditAvatarPopupOpen}
-          onClose={closeAllPopups}>
-          <input type="url" placeholder="Ссылка на фото"
-            className="popup__field popup__field_value_link popup__field_type_edit-avatar" id="link-input-avatar"
-            name="avatar" required />
-          <span className="popup__field-error link-input-avatar-error"></span>
-        </PopupWithForm>
+          <EditAvatarPopup 
+            isOpen={isEditAvatarPopupOpen} 
+            onClose={closeAllPopups} 
+            isLoadingData={isLoading}
+            onUpdateAvatar={handleUpdateAvatar}
+          />
 
           <Header />
 
@@ -138,6 +169,8 @@ function App() {
             onEditAvatar={handleEditAvatarPopupOpen}
             onCardClick={handleCardClick}
             cards={cards}
+            onCardLike={handleCardLike}
+            onCardDelete={handleCardDelete}
           />
 
           <Footer />
