@@ -17,9 +17,9 @@ function DeleteConfirmPopup(props) {
       isLoadingData={props.isLoadingData}
       isOpen={props.isOpen}
       onClose={props.onClose}
-      onSubmit={handleSubmit}>
-    </PopupWithForm>
-  )
+      onSubmit={handleSubmit}
+    ></PopupWithForm>
+  );
 
 }
 
